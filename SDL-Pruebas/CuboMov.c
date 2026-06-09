@@ -1,8 +1,8 @@
-#include<stdio.h>
+git commit -m "Elimino archivo CuboFon.c del repositorio"#include<stdio.h>
 #include<SDL2/SDL.h>
 //Esta libreria SDL es la que logra incluir las funciones SDL (Ventanas, graficos, eventos)
 
-//gcc gcc [nombre.c] -o [nombre] -lSDL2 -lSDL2_image
+//gcc [nombre.c] -o [nombre] -lSDL2 -lSDL2_image
 //./[Nombre]
 
 int main()
