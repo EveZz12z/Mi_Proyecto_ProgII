@@ -2,10 +2,10 @@
 #include <SDL2/SDL_image.h>
 #include <stdio.h>
 
+
+
 #define FILAS 30
 #define COLUMNAS 60
-//#define BLOQUE_ALTO (screenWidth / 25)
-//#define BLOQUE_ANCHO (screenWidth / 25)
 
 int main()
 {
@@ -44,7 +44,7 @@ int main()
 
         SDL_Renderer *renderer = SDL_CreateRenderer(ventana, -1, SDL_RENDERER_ACCELERATED);
         ///===
-        SDL_Surface *fondoSurface = IMG_Load("FondoBrawlhalla1.png");
+        SDL_Surface *fondoSurface = IMG_Load("1MapaBattleOfReality.png");
 
         //Verificamos si la imagen se cargo correctamente
         if(!fondoSurface)
@@ -136,10 +136,6 @@ int main()
                 const Uint8 *estado = SDL_GetKeyboardState(NULL);
 
                 SDL_Rect cubonuevo = cuadrado;
-                //cubonuevo.x = cuadrado.x;
-                //cubonuevo.y = cuadrado.y;
-                //cubonuevo.w = cuadrado.w;
-                //cubonuevo.h = cuadrado.h;
 
                 if(estado[SDL_SCANCODE_UP])
                 {
@@ -195,6 +191,8 @@ int main()
 				SDL_RenderDrawRect(renderer, &celda);
 			}
 		}
+
+		
 
                 SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);     //Color de cubo
                 SDL_RenderFillRect(renderer, &cuadrado);              //Muestra el cuadrado por ensima
