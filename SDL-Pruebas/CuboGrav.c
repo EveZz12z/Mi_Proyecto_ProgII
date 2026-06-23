@@ -73,6 +73,7 @@ int main()
     	// ============================
     	SDL_Rect bloques[2000]; // 30x60 = 1800 máx
     	int totalBloques = 0;
+    	SDL_Rect cuadrado2 = {100, 100, BLOQUE_ANCHO, BLOQUE_ALTO};
 
     	for (int i = 0; i < FILAS; i++)
 	{
@@ -85,7 +86,13 @@ int main()
                 		bloques[totalBloques].w = BLOQUE_ANCHO;
                 		bloques[totalBloques].h = BLOQUE_ALTO;
                 		totalBloques++;
+                            cuadrado2.x=j*BLOQUE_ANCHO;
+                            cuadrado2.y=i*BLOQUE_ALTO;
+        	SDL_SetRenderDrawColor(renderer, 100, 0, 0, 100);
+        	SDL_RenderFillRect(renderer, &cuadrado2);
+
             		}
+
         	}
     	}
 
@@ -254,6 +261,21 @@ int main()
         	// ============================
         	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         	SDL_RenderFillRect(renderer, &cuadrado);
+
+    	for (int i = 0; i < FILAS; i++)
+	{
+        	for (int j = 0; j < COLUMNAS; j++)
+		{
+            		if (mapa[i][j] == 1)
+			{
+                            cuadrado2.x=j*BLOQUE_ANCHO;
+                            cuadrado2.y=i*BLOQUE_ALTO;
+        	            SDL_SetRenderDrawColor(renderer, 100, 0, 0, 100);
+        	            SDL_RenderFillRect(renderer, &cuadrado2);
+
+            		}
+        	}
+    	}
 
         	SDL_RenderPresent(renderer);
         	SDL_Delay(16);
