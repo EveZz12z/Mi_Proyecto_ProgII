@@ -1,8 +1,8 @@
-
-
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
 #include<stdio.h>
+
+#include "PjBattleOfReality.c"  //Para traer las structs
 
 #define FILAS 30
 #define COLUMNAS 60
@@ -13,7 +13,7 @@ typedef struct
 {
 
 	SDL_Rect rect; //para la posicion y tamaño del bloque
-	int tipo;	//Tipo de sprite
+	int tipo;	//Tipo de sprite o bloque dañino
 } Bloque;
 
 int main()
@@ -46,6 +46,8 @@ int main()
 	int SaltoAhora=0;
 
 	int corriendo=1;    //variable que controla si el juego se mantiene o se cierra 1= se mantiene 0=se cierra (termina)
+
+	//Las variables para la barra de vida lamentablemente tienen que ir abajo :c
 
 	//Resolucion de pantalla
 	
@@ -104,7 +106,7 @@ int main()
 			
 			valor = mapa[i][j];
 
-			if(valor >= 1 && valor <=5)
+			if(valor >= 1 && valor <=6)
 			{
 				bloques[TotalBloques].rect.x = j * BLOQUE_ANCHO;  //columna (j) x tamaño de pixeles (BLOQUE_ANCHO) = posicion en base a pixeles 
 				bloques[TotalBloques].rect.y = i * BLOQUE_ALTO;   //fila (i)  x  tamaño de pixeles (BLOQUE_ALTO)  = posicion vertical en pixeles
@@ -118,15 +120,22 @@ int main()
 		}
 	}
 
-	//Pj temporal (solo es un cubo morado lol)
+	//Pj Feinryr (solo es un cubo morado lol)
 	
+	Personaje feinryr;
+	IniciarFeinryr(&feinryr);
+
 	SDL_Rect pj;
 
-	pj.w= 50; //ancho en pixeles
-	pj.h= 50; //altura en pixeles
+	//Vida en cuestion de Feinryr
 
-	pj.x= 22 * BLOQUE_ANCHO;       //ver esto al casi terminar
-	pj.y= 16 * BLOQUE_ALTO - pj.h; //
+	int VidaPorcentaje = (feinryr.Hp * 100) / feinryr.HpMax; //Calcula el porcentaje de vida actual del pj
+
+	pj.w= feinryr.W * BLOQUE_ANCHO; //ancho en pixeles
+	pj.h= feinryr.H * BLOQUE_ALTO; //altura en pixeles
+
+	pj.x= feinryr.PosX * BLOQUE_ANCHO;       //Posicion inicial
+	pj.y= feinryr.PosY * BLOQUE_ALTO - pj.h; //
 	
 
 	SDL_Event evento;
@@ -157,12 +166,12 @@ int main()
 
 		if(estado[SDL_SCANCODE_LEFT])
 		{
-			nuevo.x -=5;
+			nuevo.x -= feinryr.VelX;
 		}
 
 		if(estado[SDL_SCANCODE_RIGHT])
 		{
-			nuevo.x += 5;	
+			nuevo.x += feinryr.VelX;	
 		}
 
 
@@ -191,6 +200,20 @@ int main()
 		{
 			if(SDL_HasIntersection(&nuevo, &bloques[i].rect)) //revisamos si nuestro pj "rect nuevo" choca con el bloque actual
 			{
+
+				if(bloques[i].tipo == 6) //Bloque dañino
+				{
+					feinryr.Hp -= 5; //Si el pj choca con un bloque dañino, se le restara 5 de vida
+
+					printf("HP: %d%%\n", (feinryr.Hp * 100) / feinryr.HpMax);
+				}
+
+				if(feinryr.Hp <= 0) //Si la vida del pj es menor o igual a 0, se termina el juego
+				{
+					printf("Feinryr se a quedado sin vida...\n");
+					corriendo=0;
+				}
+				
 				if(VelocidadY > 0) //se detecta si el pj esta cayendo 
 				{
 					nuevo.y = bloques[i].rect.y - pj.h;  //dejara al pj justo sobre el bloque solido sin atravesar este mismo.
@@ -213,6 +236,21 @@ int main()
 		{
 			if(SDL_HasIntersection(&prueba, &bloques[i].rect)) //si hay colision = 1 / no hay colision = 0; / si hay colision marca ColisionH=1
 			{
+
+				if(bloques[i].tipo == 6) //Bloque dañino
+				{
+					feinryr.Hp -= 5; //Si el pj choca con un bloque dañino, se le restara 10 de vida
+
+					printf("HP: %d%%\n", (feinryr.Hp * 100) / feinryr.HpMax); //imprimimos de manera literal el "%" con doble %%
+				}
+
+				if(feinryr.Hp <= 0) //Si la vida del pj es menor o igual a 0, se termina el juego
+				{
+					printf("Feinryr se a quedado sin vida...\n");
+					corriendo=0;
+				}
+
+
 				ColisionH=1;
 				break;
 			}
@@ -234,6 +272,14 @@ int main()
 			
 		for(i=0;i<TotalBloques;i++)
 		{
+
+			if(bloques[i].tipo == 6)
+			{
+				SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); //El bloque es dañino sera color rojo 
+				SDL_RenderFillRect(renderer, &bloques[i].rect);
+				continue;
+			}
+
 			SDL_Texture *tex = NULL;
 
 			if(bloques[i].tipo == 1)
@@ -264,10 +310,34 @@ int main()
 				
 		}
 
-		//Dibujamos el pj temporal (el cubo)
+		//Dibujamos el pj feinryr (el cubo)
 
 		SDL_SetRenderDrawColor(renderer, 128, 0, 128, 255);
 		SDL_RenderFillRect(renderer, &pj);
+
+		//Barra de vida del pj
+
+		int VidaPorcentaje2 = (feinryr.Hp * 100) / feinryr.HpMax; //Calcula el porcentaje de vida actual del pj
+		int BarraAncho = VidaPorcentaje2 * 2; //Calcula el ancho de la barra de vida en base al porcentaje de vida actual del pj
+
+		SDL_Rect barraVida = {20, 20, BarraAncho, 20}; //Posicion y tamaño de la barra de vida
+
+		//Asignamos los colores segun la vida del pj
+		
+		if(VidaPorcentaje > 60)
+		{
+			SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); //Verde
+		}
+		else if(VidaPorcentaje > 45)
+		{
+			SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255); //Amarillo
+		}
+		else
+		{
+			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); //Rojo
+		}
+
+		SDL_RenderFillRect(renderer, &barraVida); //Dibuja la barra de vida
 
 		SDL_RenderPresent(renderer);
 		SDL_Delay(16);

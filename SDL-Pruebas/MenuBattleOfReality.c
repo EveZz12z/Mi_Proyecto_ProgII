@@ -87,7 +87,7 @@ int main()
 					        IMG_Quit();
 					        SDL_Quit();
 
-						system("./SpritesCol");  //Se ejecuta el juego (esto habra que cambiarlo varias veces)
+						system("./2PjEnPantalla");  //Se ejecuta el juego (esto habra que cambiarlo varias veces)
 
 					}
 					else
